@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import { Link } from 'react-router-dom';
-
 class Signin extends React.Component {
   constructor() {
     super();
@@ -23,6 +22,37 @@ class Signin extends React.Component {
     });
   }
 
+  //GET API handler for user access
+  handleSubmitUsers(event){
+    console.log(event)
+     try {
+      let res =  fetch("http://localhost:4000/api/users", {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization' : `Bearer `+ localStorage.getItem('token')
+        },
+      })
+      .then(res => res.json())
+        .then(newres => console.log(newres))
+    } catch (error) { 
+      console.log(`error occured : `, error)
+    } 
+  }
+  //Logout API Handler
+  handleSubmitLogout(event){
+    fetch('http://localhost:4000/api/auth/logout', {
+      method : "DELETE",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(res => {
+      localStorage.clear();
+    })
+  }
+
+  //Login API handler
   handleSubmit(event) {
     event.preventDefault();
 
@@ -36,15 +66,22 @@ class Signin extends React.Component {
           method: "POST",
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
-            email: this.state.input.email,
+            email: this.state.input.email, 
             password: this.state.input.password,
           }),
-        });
+        })
+        .then(res => res.json())
+          .then(newres => {
+              //Storing Token to browser's local storage
+              localStorage.setItem('token', newres.token.accessToken )
+          })
       } catch (error) {
         console.log(`error occured : `, error)
       }
  
-     /*  let input = {};
+     /* 
+      console.log(newres.token.accessToken)
+     let input = {};
       input["email"] = "";
       input["password"] = "";
       this.setState({ input: input }); */
@@ -85,10 +122,17 @@ class Signin extends React.Component {
     return (
 
       <div className="container">
+        
         <div className="row">
           <article className="col-xs-12 maincontent">
             <header className="page-header">
+              
+              <div className="col-lg-4 text-right">
+              <button className="btn btn-action" type="button" onClick={this.handleSubmitUsers}>Users</button>
+                <button className="btn btn-action" type="button" onClick={this.handleSubmitLogout}>Logout</button>
+              </div>
               <h1 className="page-title">Sign in</h1>
+              
             </header>
 
             <div className="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
@@ -133,6 +177,7 @@ class Signin extends React.Component {
                       </div>
                     </div>
                   </form>
+                  
                 </div>
               </div>
 

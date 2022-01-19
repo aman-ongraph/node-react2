@@ -2,16 +2,16 @@ import express, { query } from 'express';
 import pool from '../public/src/db/conn.js';  
 import authenticateToken from '../middleware/authorization.js';
 import bcrypt from 'bcrypt';
-const router = express.Router();
+const router = express.Router(); 
 
 //Get data form database and send in json format
 router.get('/', authenticateToken, async (req, res)=>{ 
     try {
          const users = await pool.query('select * from users;');
-         res.json({users : users.rows});
+         res.json({users : users.rows, message : "User authentication successfull"});
     } catch (error) {
         console.log(`catch error :`,error); 
-        res.status(500).json({error : error });
+        res.status(500).json({error : error }); 
     }
 })
 

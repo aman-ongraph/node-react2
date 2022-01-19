@@ -1,4 +1,4 @@
-import express, { query } from 'express';
+import express, { json, query } from 'express';
 import pool from '../public/src/db/conn.js';  
 import bcrypt from 'bcrypt';
 var app = express();
@@ -29,14 +29,14 @@ var db_check =(req, res, next)=>{
                     error : "Invalid Credential/User does not exist"
                 }); 
             }
-        }
+        } 
         
 
-    })
+    }) 
 }
 
-//middleware for checking athenticating user password from db
-var pass_check =(req, res, next)=>{
+//middleware for checking athenticating user password from db  
+var pass_check =(req, res, next)=>{  
     var getpass = `select * from users where email='${req.body.email}'`;
     pool.query(getpass, (q_err, q_res)=>{
         if(q_err){
@@ -74,9 +74,9 @@ router.post('/login', [db_check, pass_check],async (req, res)=>{
         const user = await  pool.query(getuser);
 
         let token = jwtTokens(user.rows[0]);
-        var resu =  res.cookie('refresh_token', token.refreshToken, { httpOnly : true});
-        console.log(resu);
-        res.json(token);
+        var resu =  res.cookie('access_token', token.accessToken, { httpOnly : true});
+       // console.log(resu);
+        res.json({auth : "true", token : token, result : user.rows[0].email});
         //we will get our token here after successful authenticating
 
     } catch (error) { 
@@ -109,9 +109,11 @@ router.get('/refresh_token', (req, res)=>{
     }
 })
 
-//delete token 
+//delete token on logut
 
-//router.delete('/')
+router.delete('/logout',(req, res)=>{
+    res.json({state : 'logout'});
+})
 
 
 
