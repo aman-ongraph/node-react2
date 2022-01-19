@@ -16,7 +16,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 // Initialize PORT
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 const corsOptions = {Credential : true, origin : process.env.URL || '*'};
 app.use(cors(corsOptions));
@@ -26,6 +26,7 @@ app.use(cookieParser());
 app.use('/', express.static(join(__dirname,'public')));
 
 app.use('/api/users', usersRouter);
+app.use('/api/auth', authRouter);
 app.use('/api/auth', authRouter);
 app.listen(PORT, (err, res)=>{
     if(err){
