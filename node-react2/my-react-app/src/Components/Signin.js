@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 import { Link } from 'react-router-dom';
 class Signin extends React.Component {
+  
   constructor() {
     super();
     this.state = {
@@ -22,35 +23,7 @@ class Signin extends React.Component {
     });
   }
 
-  //GET API handler for user access
-  handleSubmitUsers(event){
-    console.log(event)
-     try {
-      let res =  fetch("http://localhost:4000/api/users", {
-        method: "GET",
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization' : `Bearer `+ localStorage.getItem('token')
-        },
-      })
-      .then(res => res.json())
-        .then(newres => console.log(newres))
-    } catch (error) { 
-      console.log(`error occured : `, error)
-    } 
-  }
-  //Logout API Handler
-  handleSubmitLogout(event){
-    fetch('http://localhost:4000/api/auth/logout', {
-      method : "DELETE",
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    .then(res => {
-      localStorage.clear();
-    })
-  }
+ 
 
   //Login API handler
   handleSubmit(event) {
@@ -128,8 +101,6 @@ class Signin extends React.Component {
             <header className="page-header">
               
               <div className="col-lg-4 text-right">
-              <button className="btn btn-action" type="button" onClick={this.handleSubmitUsers}>Users</button>
-                <button className="btn btn-action" type="button" onClick={this.handleSubmitLogout}>Logout</button>
               </div>
               <h1 className="page-title">Sign in</h1>
               
