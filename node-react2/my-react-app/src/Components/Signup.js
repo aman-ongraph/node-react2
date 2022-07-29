@@ -6,8 +6,9 @@ class Signup extends React.Component {
   constructor() {
     super();
     this.state = {
-      input: {},
-      errors: {}
+      input: {}, 
+      errors: {},
+      message:{}
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -23,18 +24,57 @@ class Signup extends React.Component {
     });
   }
   handleSubmit(event) {
-    //event.preventDefault();
+    event.preventDefault();
     //alert('A name was submitted: ' + this.state.input.firstname);
     if (this.validate()) {
-      this.props.history.push('/register');
+
+       //Call API which generates authentication token
+       try {
+        let res =  fetch("http://localhost:4000/register", {
+          method: "POST",
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            firstname: this.state.input.firstname, 
+            lastname: this.state.input.lastname,
+            email: this.state.input.email, 
+            password: this.state.input.password,
+            cpassword: this.state.input.cpassword,
+          }),
+        })
+        .then(res => res.json())
+          .then(newres => {
+            console.log(newres)
+            if(newres.success===true){
+              let message = {};
+              message["msg"] = "User registration successful";
+              this.setState({
+                message: message
+              }) 
+              setTimeout(()=>{this.setState({message: "" })  }, 3000);
+            }
+            else{
+              let message = {};
+              message["msg"] = newres.data;
+              this.setState({
+                message: message
+              }) 
+              setTimeout(()=>{this.setState({message: "" })  }, 3000);
+            }
+
+          })
+      } catch (error) {
+        console.log(`error occured : `, error)
+      }
+     /*  this.props.history.push('/register');
       let input = {};
       input["firstname"] = "";
       input["lastname"] = "";
       input["email"] = "";
       input["password"] = "";
       input["cpassword"] = "";
-      this.setState({ input: input });
+      this.setState({ input: input }); */
     }else{
+
       event.preventDefault();
     }
   }
@@ -101,10 +141,11 @@ class Signup extends React.Component {
             </header>
             <div className="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
               <div className="panel panel-default">
-                <div className="panel-body">
+                <div className="panel-body">  
                   <h3 className="thin text-center">Register a new account</h3>
                   <hr />
-                  <form action="/register" method="POST" onSubmit={this.handleSubmit}>
+                  <h3 className='successmsg text-center'>{this.state.message.msg}</h3>
+                  <form action="#" method="POST" onSubmit={this.handleSubmit}>
                     <div className="top-margin">
                       <label>First Name<span className="text-danger">*</span></label>
                       <input

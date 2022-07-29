@@ -6,7 +6,7 @@ import {dirname, join} from 'path';
 import {fileURLToPath} from 'url';
 import usersRouter from './routes/user-routes.js';
 import authRouter from './routes/auth-routes.js';
-import bcrypt from 'bcrypt';
+import registerRouter from './routes/register-routes.js';
 dotenv.config();
 
 //base path of our project
@@ -24,9 +24,8 @@ app.use(express.json());
 app.use(cookieParser());
 //We will add static file in this folder public
 app.use('/', express.static(join(__dirname,'public')));
-
+app.use('/register', registerRouter);
 app.use('/api/users', usersRouter);
-app.use('/api/auth', authRouter);
 app.use('/api/auth', authRouter);
 app.listen(PORT, (err, res)=>{
     if(err){

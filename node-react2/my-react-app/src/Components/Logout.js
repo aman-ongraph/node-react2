@@ -1,4 +1,4 @@
-
+import Cookies from 'js-cookie';
 const Logout = ({style}) => {
   
   //Logout API Handler
@@ -11,6 +11,8 @@ const Logout = ({style}) => {
     })
     .then(res => {
       localStorage.clear();
+      Cookies.remove('refresh') 
+      Cookies.remove('access') 
     })
   }
 

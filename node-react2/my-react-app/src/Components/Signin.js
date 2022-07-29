@@ -1,56 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState} from 'react';
 import './App.css';
 import { Link } from 'react-router-dom';
-class Signin extends React.Component {
-  
-  constructor() {
-    super();
-    this.state = {
-      input: {},
-      errors: {}
-    };
-
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+import Cookies from 'js-cookie';
+const Signin = () =>{
+  const [user, setUser] = useState({});
+  const [logStatus, setlogStatus] = useState('');
+/*  //We can use useState instead of refrence
+  let email = React.createRef();  // React use ref to get input value
+  let password = React.createRef();  // React use ref to get input value
+   */
+  const handleChange = (e) =>{
+    setUser({...user, [e.target.name] : e.target.value})
+    //console.log(user)
   }
-
-  handleChange(event) {
-    let input = this.state.input;
-    input[event.target.name] = event.target.value;
-
-    this.setState({
-      input
-    });
-  }
-
- 
-
   //Login API handler
-  handleSubmit(event) {
+ const handleSubmit = (event)=> {
     event.preventDefault();
-
-    if (this.validate()) {
-    //  console.log(this.state.input.email);
+    /* console.log(email.current.value);
+    console.log(password.current.value); */
      // console.log(fetch("http://localhost:4000/api/auth/login"));
 
      //Call API which generates authentication token
-       try {
+        try {
+          console.log('her1')
         let res =  fetch("http://localhost:4000/api/auth/login", {
           method: "POST",
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            email: this.state.input.email, 
-            password: this.state.input.password,
-          }),
+          body: JSON.stringify( {email : user.email, password : user.password }   /* {
+            email: email.current.value, 
+            password: password.current.value,
+          } */),
         })
         .then(res => res.json())
           .then(newres => {
+             if(newres.success==='true'){
+              setlogStatus('Welcome !!')
+              setTimeout(()=>{setlogStatus('')  }, 3000);
+                //Storing access toke and refresh token in Browser's cookies
+                Cookies.set('access', newres.token.accessToken);
+                Cookies.set('refresh', newres.token.refreshToken);
+            }
+              
               //Storing Token to browser's local storage
-              localStorage.setItem('token', newres.token.accessToken )
+              //localStorage.setItem('access_token', newres.token.accessToken )
+              //Storing refresh token in browser's local storage
+             // localStorage.setItem('refresh_token', newres.token.refreshToken )
+              
+             // isLoggedIn(true);
+            //  console.log(loggedIn)
           })
       } catch (error) {
         console.log(`error occured : `, error)
-      }
+      } 
  
      /* 
       console.log(newres.token.accessToken)
@@ -58,40 +59,10 @@ class Signin extends React.Component {
       input["email"] = "";
       input["password"] = "";
       this.setState({ input: input }); */
-    }
-  }
+    
+  } 
 
-  validate() {
-    let input = this.state.input;
-    let errors = {};
-    let isValid = true;
-
-    if (!input["email"]) {
-      isValid = false;
-      errors["email"] = "Please enter your Email Address.";
-    }
-
-    if (typeof input["email"] !== "undefined") {
-
-      var pattern = new RegExp(/^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i);
-      if (!pattern.test(input["email"])) {
-        isValid = false;
-        errors["email"] = "Please enter valid Email address.";
-      }
-    }
-
-    if (!input["password"]) {
-      isValid = false;
-      errors["password"] = "Please enter your password.";
-    }
-
-    this.setState({
-      errors: errors
-    });
-
-    return isValid;
-  }
-  render() {
+  
     return (
 
       <div className="container">
@@ -112,29 +83,29 @@ class Signin extends React.Component {
                   <h3 className="thin text-center">Sign in to your account</h3>
                   <p className="text-center text-muted">No Account? <Link to="/sign-up">Register</Link></p>
                   <hr />
-
-                  <form action="/home" method="POST" onSubmit={this.handleSubmit}>
+                  <h3 className='successmsg text-center'>{logStatus}</h3>
+                  <form action="/home" onChange={handleChange} onSubmit={handleSubmit} >
                     <div className="top-margin">
                       <label>Email<span className="text-danger">*</span></label>
                       <input
+                      //Since we are using useState hook instead of refrence method
+                      //ref={email}
                         type="text"
                         name="email"
                         className="form-control"
-                        value={this.state.input.email}
-                        onChange={this.handleChange}
                       />
-                      <div className="text-danger">{this.state.errors.email}</div>
+                      <div className="text-danger"></div>
                     </div>
                     <div className="top-margin">
                       <label>Password <span className="text-danger">*</span></label>
                       <input
+                      //Since we are using useState hook instead of refrence method
+                      //ref={password} 
                         type="password"
                         name="password"
                         className="form-control"
-                        value={this.state.input.password}
-                        onChange={this.handleChange}
                       />
-                      <div className="text-danger">{this.state.errors.password}</div>
+                      <div className="text-danger"></div>
                     </div>
 
                     <hr />
@@ -159,6 +130,6 @@ class Signin extends React.Component {
         </div>
       </div>
     );
-  }
+  
 }
 export default Signin;

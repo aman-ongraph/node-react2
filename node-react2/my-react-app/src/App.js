@@ -6,6 +6,8 @@ import Sites from './Routes';
 import React, { useState } from 'react'; 
 
 function App() {
+
+	const [loggedIn, isLoggedIn] = useState(false)
 	return (
 
 		<Router>
