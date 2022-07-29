@@ -5,6 +5,7 @@ import Home from "./Components/Home";
 import Signup from "./Components/Signup";
 import Signin from "./Components/Signin";
 import Forgetpassword from "./Components/Forgetpassword";
+import Users from "./Components/Users";
 
 class Sites extends React.Component {
     render() {
@@ -15,6 +16,7 @@ class Sites extends React.Component {
                     <Route exact path="/sign-up" element={<Signup/>} />
                     <Route exact path="/sign-in" element={<Signin/>} />
                     <Route exact path="/forget-password" element={<Forgetpassword />} />
+                    <Route exact path="/users" element={<Users/>} />
                 </Routes>
             </div>
         );

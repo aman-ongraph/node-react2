@@ -5,6 +5,8 @@ var app = express();
 import jwtTokens from '../utils/jwt-helpers.js';
 import jwt from 'jsonwebtoken';
 const router = express.Router();
+import pkg from '@prisma/client';
+const {PrismaClient} = pkg; 
 //middleware for checking user existance form db
 var db_check =(req, res, next)=>{
     var duplicatecheck = `select count(email) from users where email='${req.body.email}'`;
@@ -29,7 +31,7 @@ var db_check =(req, res, next)=>{
                     error : "Invalid Credential/User does not exist"
                 }); 
             }
-        } 
+        }  
         
 
     }) 
@@ -62,7 +64,7 @@ var pass_check =(req, res, next)=>{
                 }); 
                 }
             });
-        }
+        } 
         
 
     })
@@ -72,14 +74,13 @@ router.post('/login', [db_check, pass_check],async (req, res)=>{
         //jwt token 
         var getuser = `select * from users where email='${req.body.email}'`;
         const user = await  pool.query(getuser);
-
         let token = jwtTokens(user.rows[0]);
-        var resu =  res.cookie('access_token', token.accessToken, { httpOnly : true});
-       // console.log(resu);
-        res.json({auth : "true", token : token, result : user.rows[0].email});
+        var resu =  res.cookie('refresh_token', token.refreshToken, { httpOnly : true});
+     // console.log(token.accessToken);
+        res.json({success : "true", auth : "true", token : token, result : user.rows[0].email});
         //we will get our token here after successful authenticating
 
-    } catch (error) { 
+    } catch (error) {    
         console.log(error)
         res.status(401).json({
             error : error
@@ -88,24 +89,26 @@ router.post('/login', [db_check, pass_check],async (req, res)=>{
 })
 
 //api for refresh token
-router.get('/refresh_token', (req, res)=>{
-    try {
-        const refreshToken = req.cookies.refresh_token;
-        console.log(refreshToken);
+router.post('/refresh_token', (req, res)=>{ 
+    try {     
+        //const refreshToken = req.cookies.refresh_token;
+        const refreshToken = req.body.refresh_token;
+        console.log(refreshToken); 
         if(refreshToken === null) return res.status(401).json({error : "null refresh token"})
         //verifying refresh token against our secret keys, if it is generated from the same refresh token or not
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (error, user)=>{
-            if(error)  return res.status(401).json({error : error})
+            if(error)  return res.status(401).json({error : error, messaage : "error while verifying"})
             let token = jwtTokens(user);
             res.cookie('refresh_token', token.refreshToken, { secure: true , httpOnly : true});
-            res.json(token);
-        })
-
-    } catch (error) {
+            console.log(`refreshed token   `+ token.refreshToken)
+            res.json(token);    
+        })   
+  
+    } catch (error) { 
         console.log(error)
         res.status(401).json({
             error : "caught error"
-        }); 
+        });  
     }
 })
 
